@@ -6,6 +6,7 @@ class Graph():
 
     def __init__(self, lines):
         self.lines = lines
+        self.corners = []
         self.horizon_lines = []
         self.vertical_lines = []
 
@@ -31,3 +32,4 @@ class Graph():
 
         for line in self.lines:
             line.line_link()
+            self.corners += line.corners

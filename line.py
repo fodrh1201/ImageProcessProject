@@ -16,6 +16,6 @@ class Line():
                 r.left = l
         else:
             self.corners = sorted(self.corners, key=lambda corner: corner.y)
-            for u, d in zip(self.corners[:-1], self.corners[1:]):
+            for d, u in zip(self.corners[:-1], self.corners[1:]):
                 u.down = d
                 d.up = u
