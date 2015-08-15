@@ -4,17 +4,30 @@ from corner import Corner
 
 class Graph():
 
-    def __init__(self, horizon_lines, vertical_lines):
-        self.horizon_lines = horizon_lines
-        self.vertical_lines = vertical_lines
+    def __init__(self, lines):
+        self.lines = lines
+        self.horizon_lines = []
+        self.vertical_lines = []
+
+    def set_directed_lines(self):
+        for line in self.lines:
+            if line.direction is 'h':
+                self.horizon_lines.append(line)
+            else:
+                self.vertical_lines.append(line)
 
     def make_graph(self):
-        def find_root_with_lines(line_eq, lines):
-            coeff_x, coeff_y, bias = line_eq
-            A = [np.array([[coeff_x, coeff_y], [cx, cy]]) for cx, cy, cb in lines]
-            B = [np.array([bias, cb]) for cx, cy, cb in self.vertical_lines]
-            roots = [np.linalg.solve(a, b) for a, b in zip(A, B)]
-            return roots
+        self.set_directed_lines()
 
-        def make_corners(roots, direction):
-            if direction is 'h':
+        for h_line in self.horizon_lines:
+            coeff_x, coeff_y, bias = h_line.eq
+            for v_line in self.vertical_lines:
+                cx, cy, b = v_line.eq
+                A = np.array([[coeff_x, coeff_y], [cx, cy]])
+                B = np.array([bias, b])
+                root = Corner(np.linalg.solve(A, B))
+                h_line.corners.append(root)
+                v_line.corners.append(root)
+
+        for line in self.lines:
+            line.line_link()

@@ -2,10 +2,9 @@
 
 class Corner():
 
-    def __init__(self, corner, horizon_line, vertical_line):
+    def __init__(self, corner):
         self.corner = corner
-        self.horizon_line = horizon_line
-        self.vertical_line = vertical_line
+        self.x, self.y = self.corner
         self.up = None
         self.right = None
         self.down = None
