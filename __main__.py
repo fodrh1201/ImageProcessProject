@@ -7,6 +7,7 @@ import random
 from skimage import io
 
 images = io.ImageCollection('./photo/*')
+images = images[1:-2]
 
 fig, axes = plt.subplots(nrows=2, ncols=len(images))
 

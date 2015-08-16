@@ -10,16 +10,11 @@ class Walker():
         self.find_root()
         self.collect_quad_list()
 
-
     def find_root(self):
         while self.root.left is not None:
             self.root = self.root.left
         while self.root.down is not None:
             self.root = self.root.down
-
-        print('root', self.root, self.root.right, self.root.right.up, self.root.right.up.left)
-        print('root', self.root, self.root.right, self.root.right.up, self.root.up)
-
 
     def collect_quad_list(self):
         origin_v = self.root
