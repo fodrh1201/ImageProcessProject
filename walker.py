@@ -1,42 +1,30 @@
+import copy
 
 class Walker():
 
-    def __init__(self, root, direction, graph):
-        self.root = root
-        self.direction = direction
-        self.current_corner = root
-        self.quad_list = [root]
-        self.graph = graph
+    # single ton 으로 바꿀 여지 있
+    def __init__(self, corners):
+        self.corners = corners
+        self.root = corners[0]
+        self.quad_list = []
+        self.find_root()
+        self.get_quad_list()
 
-        if root is None:
-            return
-        self.start()
+    def find_root(self):
+        while self.root.left is not None:
+            self.root = self.root.left
+        while self.root.down is not None:
+            self.root = self.root.down
 
-    def start(self):
-        def when_up():
-            self.current_corner = self.root.up
-            self.turn_left()
-            self.turn_right()
-            self.graph.start_walker(Walker(self.root.up, 'up', self.graph))
+    def collect_quad_list(self):
+        origin_v = self.root
+        while origin_v.up is not None:
+            origin_h = copy.deepcopy(origin_v)
+            while origin_h.right is not None:
+                quad = [origin_h, origin_h.right, origin_h.right.up, origin_h.up]
+                self.quad_list.append(quad)
+                origin_h = origin_h.right
+            origin_v = origin_v.up
 
-        def when_down():
-            self.current_corner = self.current_corner.down
-
-        def when_left():
-            self.current_corner = self.current_corner.left
-
-        def when_right():
-            self.current_corner = self.current_corner.right
-
-        return {
-            'up': when_up,
-            'down': when_down,
-            'right': when_right,
-            'left': when_left
-        }[self.direction]()
-
-    def turn_left(self):
-        return
-
-    def turn_right(self):
-        return
+    def get_quad_list(self):
+        return self.quad_list

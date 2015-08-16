@@ -1,6 +1,8 @@
 import numpy as np
 
+
 from corner import Corner
+from walker import Walker
 
 class Graph():
 
@@ -9,6 +11,10 @@ class Graph():
         self.corners = []
         self.horizon_lines = []
         self.vertical_lines = []
+        self.walker = None
+
+        self.set_directed_lines()
+        self.make_graph()
 
     def set_directed_lines(self):
         for line in self.lines:
@@ -33,3 +39,7 @@ class Graph():
         for line in self.lines:
             line.line_link()
             self.corners += line.corners
+        self.walker = Walker(self.corners)
+
+    def get_quad_list(self):
+        return self.walker.get_quad_list()

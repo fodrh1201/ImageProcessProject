@@ -18,7 +18,7 @@ class Image():
         self.line_config = None
 
         if config is not None:
-            self.setconfig()
+            self.set_config()
 
     def set_config(self):
         if 'edge_config' in self.config:
@@ -65,6 +65,7 @@ class Image():
             else:
                 newline = Line([cosine, sine, dist], 'v')
             self.lines.append(newline)
+
 
     # def draw_lines(self):
     #
