@@ -9,3 +9,6 @@ class Corner():
         self.right = None
         self.down = None
         self.left = None
+
+    def __repr__(self):
+        return "({0}, {1})".format(self.x, self.y)

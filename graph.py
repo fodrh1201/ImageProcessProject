@@ -24,7 +24,6 @@ class Graph():
                 self.vertical_lines.append(line)
 
     def make_graph(self):
-        self.set_directed_lines()
 
         for h_line in self.horizon_lines:
             coeff_x, coeff_y, bias = h_line.eq
@@ -32,13 +31,14 @@ class Graph():
                 cx, cy, b = v_line.eq
                 A = np.array([[coeff_x, coeff_y], [cx, cy]])
                 B = np.array([bias, b])
-                root = Corner(np.linalg.solve(A, B))
+                root = Corner(np.linalg.solve(A, B).astype(int))
                 h_line.corners.append(root)
                 v_line.corners.append(root)
+                self.corners.append(root)
 
         for line in self.lines:
             line.line_link()
-            self.corners += line.corners
+
         self.walker = Walker(self.corners)
 
     def get_quad_list(self):

@@ -13,9 +13,15 @@ class Image():
         self.lines = []
         self.line_images = []
         self.rectangles = []
+
         self.edge_config = None
         self.blur_config = None
         self.line_config = None
+
+        self.is_blur = False
+        self.is_edge = False
+        self.is_line = False
+        self.is_graph = False
 
         if config is not None:
             self.set_config()
@@ -36,9 +42,12 @@ class Image():
         else:
             self.blurred_img = ndi.gaussian_filter(self.gray_img, sigma=5)
 
+        self.is_blur = True
+
     def set_edges(self):
 
-        self.set_blurred_img()
+        if not self.is_blur:
+            self.set_blurred_img()
 
         from skimage.feature import canny
 
@@ -47,9 +56,12 @@ class Image():
         else:
             self.edges = canny(self.blurred_img, sigma=2)
 
+        self.is_edge = True
+
     def set_lines(self):
 
-        self.set_edges()
+        if not self.is_edge:
+            self.set_edges()
 
         from skimage.transform import hough_line, hough_line_peaks
         from line import Line
@@ -66,6 +78,44 @@ class Image():
                 newline = Line([cosine, sine, dist], 'v')
             self.lines.append(newline)
 
+        self.is_line = True
+
+    def set_graph(self):
+
+        if not self.is_line:
+            self.set_lines()
+
+        from graph import Graph
+
+        graph = Graph(self.lines)
+        self.rectangles = graph.get_quad_list()
+
+        self.is_graph = True
+
+    def get_rectangles(self):
+
+        if not self.is_graph:
+            self.set_graph()
+
+        return self.rectangles
+
+    def polygon_area(self, corners):
+        n = len(corners)
+        area = 0.0
+        for i in range(n):
+            j = (i + 1) % n
+            area += corners[i].corner[0] * corners[j].corner[1]
+            area -= corners[j].corner[0] * corners[i].corner[1]
+        area = abs(area) / 2.0
+        return area
+
+    def get_poly_coords(self):
+        if not self.is_graph:
+            self.set_graph()
+
+        y_coords = map(lambda x: map(lambda y: y.corner[1], x), self.rectangles)
+        x_coords = map(lambda x: map(lambda y: y.corner[0], x), self.rectangles)
+        return zip(y_coords, x_coords)
 
     # def draw_lines(self):
     #
