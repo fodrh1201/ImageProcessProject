@@ -1,4 +1,6 @@
 import numpy as np
+import random
+import copy
 
 from skimage.color import rgb2gray
 
@@ -13,6 +15,7 @@ class Image():
         self.lines = []
         self.line_images = []
         self.rectangles = []
+        self.poly_images = np.zeros(self.gray_img.shape, dtype=np.uint8)
 
         self.edge_config = None
         self.blur_config = None
@@ -68,7 +71,7 @@ class Image():
 
         h, theta, d = hough_line(self.edges)
 
-        for _, angle, dist in zip(*hough_line_peaks(h, theta, d, threshold=100)):
+        for _, angle, dist in zip(*hough_line_peaks(h, theta, d, threshold=150)):
             cosine = np.cos(angle)
             sine = np.sin(angle)
 
@@ -116,6 +119,38 @@ class Image():
         y_coords = map(lambda x: map(lambda y: y.corner[1], x), self.rectangles)
         x_coords = map(lambda x: map(lambda y: y.corner[0], x), self.rectangles)
         return zip(y_coords, x_coords)
+
+    def poly_images(self):
+        from skimage.draw import polygon
+
+        for y_coords, x_coords in self.get_poly_coords():
+            rr, cc = polygon(np.asarray(y_coords), np.asarray(x_coords), self.poly_images.shape)
+            rand = random.randrange(50, 256)
+            self.poly_images[rr, cc] = rand
+        return self.poly_images
+
+    def max_area_coords(self):
+        self.rectangles = sorted(self.get_rectangles(), key=lambda x: self.polygon_area(x))
+        return self.rectangles[-1]
+
+    def max_area_image(self):
+        from skimage.draw import polygon
+
+        coords = self.max_area_coords()
+        y_coords = map(lambda y: y.corner[1], coords)
+        x_coords = map(lambda x: x.corner[0], coords)
+
+        pic = np.zeros(self.gray_img.shape, dtype=np.uint8)
+        rr, cc = polygon(np.asarray(y_coords), np.asarray(x_coords), pic.shape)
+        pic[rr, cc] = 255
+        return pic
+
+    def selected_img(self):
+        max_mask = self.max_area_image() > 250
+        img = copy.deepcopy(self.img)
+        img[~max_mask] = np.array([0, 0, 0])
+        return img
+
 
     # def draw_lines(self):
     #
